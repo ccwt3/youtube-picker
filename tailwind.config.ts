@@ -57,6 +57,10 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      width: {
+        card: "var(--card-width)",
+        filter: "var(--filter-width)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
