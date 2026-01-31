@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Button } from "@/components/ui/button";
 import FilterVar from "@/components/home/filter";
+import { VideoSection } from "@/components/home/video";
 import { getVideo } from "@/lib/handleGetVideo";
 
 export default function Home() {
@@ -9,8 +10,8 @@ export default function Home() {
       <FilterVar />
 
       <section className="flex flex-col justify-center items-center gap-3 p-6 border border-black bg-red-500 w-card">
-        <div className="w-30 h-8 bg-cyan-300 text-black">
-          <h1>Here must be the video</h1>
+        <div className="min-w-30 min-h-8 text-black">
+          <VideoSection />
         </div>
 
         <div>
