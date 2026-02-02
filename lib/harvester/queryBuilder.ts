@@ -8,8 +8,14 @@ interface tagArray {
   topic: string;
 }
 
+function separator(itemData: any) {
+  itemData;
+}
+
 export async function builder(tags: tagArray[]) {
-  const baseUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1`;
+  //* Builder Function
+  const outPutNumber = 2;
+  const baseUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${outPutNumber}`;
 
   const fetchPromises = tags.map((combination) => {
     const topicQuery = encodeURIComponent(combination.topic); // 👈 Encodear
@@ -17,12 +23,10 @@ export async function builder(tags: tagArray[]) {
 
     if (combination.time === "short") {
       const url = `${baseUrl}&q=${topicQuery}&videoDuration=medium&key=${apiKey}`;
-      console.log(`🔍 [${combination.topic}] ${url}`);
       return fetch(url);
     }
 
     const url = `${baseUrl}&q=${topicQuery}&key=${apiKey}`;
-    console.log(`🔍 [${combination.topic}] ${url}`);
     return fetch(url);
   });
 
@@ -40,23 +44,31 @@ export async function builder(tags: tagArray[]) {
       continue;
     }
 
-    const data = await res.json();
-    const itemCount = data.items?.length || 0;
-
-    console.log(`\n📊 [${tag.topic}] Items recibidos: ${itemCount}`);
+    const data: any = await res.json();
 
     // Workaround: forzar maxResults en cliente
-    if (data.items && data.items.length > 1) {
-      console.warn(`⚠️  API ignoró maxResults=1, limitando manualmente`);
-      data.items = data.items.slice(0, 1);
+    if (data.items && data.items.length > outPutNumber) {
+      console.warn(
+        `⚠️  API ignoró maxResults=${outPutNumber}, limitando manualmente`,
+      );
+      data.items = data.items.slice(0, outPutNumber);
     }
 
-    console.log(data.items);
-    const items = data.items;
+    //console.log(data.items);
+
+    const videosReferences = data.items.map((info: any) => {
+      return {
+        id: info.id.videoId,
+        title: info.snippet.title,
+      };
+    });
+
+    console.log(videosReferences);
   }
 }
 
 async function executer() {
+  //* starter function
   // 👈 Hacer async
   const dailyTimeTag = timeSnaps[0].id;
 
@@ -64,11 +76,7 @@ async function executer() {
     return { time: dailyTimeTag, topic: topic.id };
   });
 
-  console.log("📋 Tags a buscar:", tagsObjectArray);
-
   await builder(tagsObjectArray); // 👈 Esperar con await
-
-  console.log("\n✅ Búsquedas completadas");
 }
 
 executer().catch(console.error); // 👈 Manejar errores

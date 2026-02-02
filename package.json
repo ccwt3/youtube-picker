@@ -6,7 +6,8 @@
     "start": "next start",
     "lint": "eslint .",
     "sb_start": "pnpm dlx supabase start",
-    "sb_stop": "pnpm dlx supabase stop"
+    "sb_stop": "pnpm dlx supabase stop",
+    "harvester": "pnpm dlx tsx lib/harvester/queryBuilder.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.1",
