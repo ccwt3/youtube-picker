@@ -3,8 +3,8 @@ import { manualIds } from "../filterType";
 const baseUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&key=${process.env.API_KEY}`;
 
 interface manualVideos {
-  tag: string;
   id: string;
+  videoId: string;
 }
 
 export interface YouTubeVideoItem {
@@ -25,7 +25,7 @@ export interface YouTubeVideoItem {
 export async function fetcher(ids: manualVideos[]) {
   const responses = await Promise.all(
     ids.map((videoObj) =>
-      fetch(`${baseUrl}&id=${videoObj.id}`).then((res) => res.json()),
+      fetch(`${baseUrl}&id=${videoObj.videoId}`).then((res) => res.json()),
     ),
   );
 

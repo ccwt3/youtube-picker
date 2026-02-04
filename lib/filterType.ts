@@ -14,10 +14,10 @@ export const videoTopics = [
 ];
 
 export const manualIds = [
-  { tag: "religious", id: "Vf2WbZwClRk" },
-  { tag: "podcast", id: "YB8ma6fmb1A" },
-  { tag: "learning", id: "bSDprg24pEA" },
-  { tag: "philosophy", id: "LaffA9EyUgo" },
-  { tag: "videogames", id: "_NN7fzllqBQ" },
-  { tag: "documentary", id: "wLFY_Zu_O08&t=9s" },
+  { id: "religious", videoId: "Vf2WbZwClRk" },
+  { id: "podcast", videoId: "YB8ma6fmb1A" },
+  { id: "learning", videoId: "bSDprg24pEA" },
+  { id: "philosophy", videoId: "LaffA9EyUgo" },
+  { id: "videogames", videoId: "_NN7fzllqBQ" },
+  { id: "documentary", videoId: "wLFY_Zu_O08&t=9s" },
 ];

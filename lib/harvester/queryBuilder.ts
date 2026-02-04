@@ -6,21 +6,11 @@ interface tagArray {
   topic: string;
 }
 
-export async function builder(tags: tagArray[]) {
-  //* Builder Function
-  const outPutNumber = 2;
-  const baseUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${outPutNumber}`;
-
-  const urls = tags.map((combination) => {
-    const topicQuery = encodeURIComponent(combination.topic);
-    const duration =
-      combination.time === "short"
-        ? "&videoDuration=medium"
-        : "videoDuration=long";
-    return `${baseUrl}&q=${topicQuery}${duration}&key=${process.env.API_KEY}`;
-  });
-
-  // 2️⃣ Fetch en paralelo
+async function queryFetcher(
+  tags: tagArray[],
+  outPutNumber: number,
+  urls: string[],
+) {
   const responses = await Promise.all(urls.map((url) => fetch(url)));
 
   // ✅ Usar for...of en lugar de forEach
@@ -49,8 +39,8 @@ export async function builder(tags: tagArray[]) {
 
     const videosReferences = data.items.map((info: any) => {
       return {
-        id: info.id.videoId,
-        title: info.snippet.title,
+        id: tag.topic,
+        videoId: info.id.videoId,
       };
     });
 
@@ -58,15 +48,33 @@ export async function builder(tags: tagArray[]) {
   }
 }
 
+function queryBuilder(tags: tagArray[], outPutNumber: number) {
+  //* Builder Function
+  const baseUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${outPutNumber}`;
+
+  const urls = tags.map((combination) => {
+    const topicQuery = encodeURIComponent(combination.topic);
+    const duration =
+      combination.time === "short"
+        ? "&videoDuration=medium"
+        : "videoDuration=long";
+    return `${baseUrl}&q=${topicQuery}${duration}&key=${process.env.API_KEY}`;
+  });
+
+  return urls;
+}
+
 async function executer() {
   //* starter function
   const dailyTimeTag = timeSnaps[0].id;
+  const outPutNumber = 2;
 
   const tagsObjectArray = videoTopics.map((topic) => {
     return { time: dailyTimeTag, topic: topic.id };
   });
 
-  await builder(tagsObjectArray); // 👈 Esperar con await
+  const queries = queryBuilder(tagsObjectArray, outPutNumber);
+  await queryFetcher(tagsObjectArray, outPutNumber, queries);
 }
 
 executer().catch(console.error); // 👈 Manejar errores
