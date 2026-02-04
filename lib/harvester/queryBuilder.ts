@@ -1,15 +1,9 @@
 import { timeSnaps, videoTopics } from "../filterType";
-import { config } from "dotenv";
-import { resolve } from "path";
-config({ path: resolve(process.cwd(), ".env.local") });
+import "dotenv/config";
 
 interface tagArray {
   time: string;
   topic: string;
-}
-
-function separator(itemData: any) {
-  itemData;
 }
 
 export async function builder(tags: tagArray[]) {
@@ -17,20 +11,17 @@ export async function builder(tags: tagArray[]) {
   const outPutNumber = 2;
   const baseUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${outPutNumber}`;
 
-  const fetchPromises = tags.map((combination) => {
-    const topicQuery = encodeURIComponent(combination.topic); // 👈 Encodear
-    const apiKey = process.env.API_KEY;
-
-    if (combination.time === "short") {
-      const url = `${baseUrl}&q=${topicQuery}&videoDuration=medium&key=${apiKey}`;
-      return fetch(url);
-    }
-
-    const url = `${baseUrl}&q=${topicQuery}&key=${apiKey}`;
-    return fetch(url);
+  const urls = tags.map((combination) => {
+    const topicQuery = encodeURIComponent(combination.topic);
+    const duration =
+      combination.time === "short"
+        ? "&videoDuration=medium"
+        : "videoDuration=long";
+    return `${baseUrl}&q=${topicQuery}${duration}&key=${process.env.API_KEY}`;
   });
 
-  const responses = await Promise.all(fetchPromises);
+  // 2️⃣ Fetch en paralelo
+  const responses = await Promise.all(urls.map((url) => fetch(url)));
 
   // ✅ Usar for...of en lugar de forEach
   for (let i = 0; i < responses.length; i++) {
@@ -69,7 +60,6 @@ export async function builder(tags: tagArray[]) {
 
 async function executer() {
   //* starter function
-  // 👈 Hacer async
   const dailyTimeTag = timeSnaps[0].id;
 
   const tagsObjectArray = videoTopics.map((topic) => {

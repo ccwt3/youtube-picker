@@ -1,11 +1,15 @@
-import { supabase } from "../supabase/serverClient";
+import { supabase } from "../supabase/scriptClient";
 
 async function main() {
-  const { error } = await supabase
+  const { status, error } = await supabase
     .from("video")
-    .insert({ url: "asd", title: "omar", language: "english" });
+    .insert({ url: "just ur doll", title: "jose", language: "english" });
 
-  return;
+  if (error) {
+    return console.error(error);
+  } else {
+    return console.log(status);
+  }
 }
 
 main();
