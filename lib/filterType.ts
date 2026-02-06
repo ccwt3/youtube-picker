@@ -7,7 +7,7 @@ export const timeSnaps = [
 
 export const videoTopics = [
   { id: "philosophy", content: "Philosophy" },
-  { id: "gameplay", content: "Videogames" },
+  { id: "videogames", content: "Videogames" },
   { id: "podcast", content: "Podcasts" },
   { id: "documentary", content: "Documentary" },
   { id: "learning", content: "Learning" },

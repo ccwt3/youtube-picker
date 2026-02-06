@@ -11,6 +11,7 @@ async function queryFetcher(
   outPutNumber: number,
   urls: string[],
 ) {
+  const videoReferences: any = [];
   const responses = await Promise.all(urls.map((url) => fetch(url)));
 
   // ✅ Usar for...of en lugar de forEach
@@ -30,22 +31,22 @@ async function queryFetcher(
     // Workaround: forzar maxResults en cliente
     if (data.items && data.items.length > outPutNumber) {
       console.warn(
-        `⚠️  API ignoró maxResults=${outPutNumber}, limitando manualmente`,
+        `⚠️  API ignoró maxResults=${outPutNumber} en ${tag.topic}, limitando manualmente`,
       );
       data.items = data.items.slice(0, outPutNumber);
     }
 
     //console.log(data.items);
 
-    const videosReferences = data.items.map((info: any) => {
-      return {
+    data.items.forEach((info: any) => {
+      videoReferences.push({
         id: tag.topic,
         videoId: info.id.videoId,
-      };
+      });
     });
-
-    console.log(videosReferences);
   }
+
+  return videoReferences;
 }
 
 function queryBuilder(tags: tagArray[], outPutNumber: number) {
@@ -64,7 +65,7 @@ function queryBuilder(tags: tagArray[], outPutNumber: number) {
   return urls;
 }
 
-async function executer() {
+export async function generalFetcher() {
   //* starter function
   const dailyTimeTag = timeSnaps[0].id;
   const outPutNumber = 2;
@@ -74,7 +75,12 @@ async function executer() {
   });
 
   const queries = queryBuilder(tagsObjectArray, outPutNumber);
-  await queryFetcher(tagsObjectArray, outPutNumber, queries);
-}
 
-executer().catch(console.error); // 👈 Manejar errores
+  const videoReferences = await queryFetcher(
+    tagsObjectArray,
+    outPutNumber,
+    queries,
+  );
+
+  return videoReferences;
+}

@@ -7,36 +7,37 @@ interface manualVideos {
   videoId: string;
 }
 
-export interface YouTubeVideoItem {
+interface YouTubeVideoItem {
   kind: "youtube#video";
   etag: string;
   id: string;
   snippet: {
     channelId: string;
     title: string;
-    description: string;
-    channelTitle: string;
     tags?: string[];
     categoryId: string;
     defaultLanguage?: string;
   };
 }
 
+//? Manual tags (temporal)
 export async function fetcher(ids: manualVideos[]) {
   const responses = await Promise.all(
-    ids.map((videoObj) =>
-      fetch(`${baseUrl}&id=${videoObj.videoId}`).then((res) => res.json()),
-    ),
+    ids.map(async (videoObj) => {
+      const res = await fetch(`${baseUrl}&id=${videoObj.videoId}`);
+      return { tag: videoObj.id, data: await res.json() };
+    }),
   );
 
   const filteredData = responses.flatMap(
-    (rawData) =>
-      rawData.items?.map((item: YouTubeVideoItem) => ({
-        id: item.id,
+    ({ tag, data }) =>
+      data.items?.map((item: YouTubeVideoItem) => ({
+        videoUrl: `https://www.youtube.com/embed/${item.id}`,
         title: item.snippet.title,
-        tags: item.snippet.tags,
+        tags: tag, //todo MODIFICAR TODO EL SISTEMA DE TAGS
         category: item.snippet.categoryId,
         language: item.snippet.defaultLanguage,
+        author: item.snippet.channelId,
       })) || [],
   );
 

@@ -7,7 +7,7 @@
     "lint": "eslint .",
     "sb_start": "pnpm dlx supabase start",
     "sb_stop": "pnpm dlx supabase stop",
-    "harvester": "pnpm dlx tsx lib/harvester/queryBuilder.ts",
+    "harvester": "pnpm dlx tsx lib/harvester/harvester.ts",
     "populate": "pnpm dlx tsx lib/harvester/populateDB.ts"
   },
   "dependencies": {
