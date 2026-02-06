@@ -2,12 +2,19 @@
 
 export async function getVideo() {
   const rawData = localStorage.getItem("filters");
+  let filterData;
   if (rawData) {
-    const data = JSON.parse(rawData);
-    console.log(data);
+    filterData = JSON.parse(rawData);
   }
 
-  const response = await fetch("api/getNovia");
+  const response = await fetch("api/video", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ filterData }),
+  });
+
   const video = await response.json();
   console.log(video);
 }
