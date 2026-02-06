@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { manualIds } from "../filterType";
 const baseUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&key=${process.env.API_KEY}`;
 
 interface manualVideos {
@@ -41,8 +40,6 @@ export async function fetcher(ids: manualVideos[]) {
       })) || [],
   );
 
-  console.log(filteredData);
+  //console.log(filteredData); //! log
   return filteredData;
 }
-
-fetcher(manualIds);

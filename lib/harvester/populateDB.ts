@@ -13,32 +13,32 @@ interface NormalizerType {
   id: number;
 }
 
-const inputMock = [
-  {
-    title: "elpepe",
-    language: "en",
-    videoUrl: "achetetepe",
-    category: "2",
-    author: "me",
-    tags: "religious",
-  },
-  {
-    title: "sech",
-    language: "es",
-    videoUrl: "etesech",
-    category: "2",
-    tags: "learning",
-    author: "me",
-  },
-  {
-    title: "sech",
-    language: "es",
-    videoUrl: "mebadoler",
-    tags: "documentary",
-    category: "3",
-    author: "elpepe",
-  },
-];
+//const inputMock = [
+//  {
+//    title: "elpepe",
+//    language: "en",
+//    videoUrl: "achetetepe",
+//    category: "2",
+//    author: "me",
+//    tags: "religious",
+//  },
+//  {
+//    title: "sech",
+//    language: "es",
+//    videoUrl: "etesech",
+//    category: "2",
+//    tags: "learning",
+//    author: "me",
+//  },
+//  {
+//    title: "sech",
+//    language: "es",
+//    videoUrl: "mebadoler",
+//    tags: "documentary",
+//    category: "3",
+//    author: "elpepe",
+//  },
+//];
 
 async function videoTableUploader(payload: CleanVideoReferences[]) {
   const { data, error } = await supabase
@@ -54,7 +54,7 @@ async function videoTableUploader(payload: CleanVideoReferences[]) {
     return [];
   }
 
-  console.log("video table info: ", data);
+  //console.log("video table info: ", data); //! log
   const videosIds = data.flatMap((video) => video.id);
   return videosIds;
 }
@@ -75,13 +75,13 @@ export async function storer(payload: CleanVideoReferences[]) {
         return;
       }
 
-      console.log("tags data: ", data); //! log
+      // console.log("tags data: ", data); //! log
       return data[0].id;
     }),
   );
 
-  console.log("id de los tags: ", tagsData); //! log
-  console.log("videos ids: ", videosIds); //! log
+  // console.log("id de los tags: ", tagsData); //! log
+  // console.log("videos ids: ", videosIds); //! log
 
   const normalizedPairs = [];
 
@@ -94,13 +94,13 @@ export async function storer(payload: CleanVideoReferences[]) {
     normalizedPairs.push(pair);
   }
 
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from("video_tags")
     .insert(normalizedPairs)
     .select();
 
-  console.log("pares: ", normalizedPairs); //! log
-  return console.log("Informacion normalizada: ", data); //! log
-}
+  // console.log("pares: ", normalizedPairs); //! log
+  // console.log("Informacion normalizada: ", data); //! log
 
-storer(inputMock);
+  return { data, status };
+}
