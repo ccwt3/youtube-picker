@@ -13,33 +13,6 @@ interface NormalizerType {
   id: number;
 }
 
-//const inputMock = [
-//  {
-//    title: "elpepe",
-//    language: "en",
-//    videoUrl: "achetetepe",
-//    category: "2",
-//    author: "me",
-//    tags: "religious",
-//  },
-//  {
-//    title: "sech",
-//    language: "es",
-//    videoUrl: "etesech",
-//    category: "2",
-//    tags: "learning",
-//    author: "me",
-//  },
-//  {
-//    title: "sech",
-//    language: "es",
-//    videoUrl: "mebadoler",
-//    tags: "documentary",
-//    category: "3",
-//    author: "elpepe",
-//  },
-//];
-
 async function videoTableUploader(payload: CleanVideoReferences[]) {
   const { data, error } = await supabase
     .from("video")
