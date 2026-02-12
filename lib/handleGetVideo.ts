@@ -7,5 +7,8 @@ export async function getVideo() {
     filterData = JSON.parse(rawData);
   }
 
-  console.log(filterData);
+  const res = await fetch("/api/video");
+  const data = await res.json();
+
+  return console.log(data);
 }
