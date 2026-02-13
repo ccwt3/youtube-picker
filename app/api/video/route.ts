@@ -1,6 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+function randomIndex(min: number, max: number) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+
+  return Math.floor(Math.random() * (maxFloored - minCeiled)) + minCeiled;
+}
+
 async function randomVideo() {
   const supabase = await createClient();
   const { data, error } = await supabase.from("video").select(`
@@ -15,7 +22,17 @@ async function randomVideo() {
   `);
 
   if (error) console.error(error);
-  return data;
+
+  let idx;
+
+  if (Array.isArray(data)) {
+    idx = randomIndex(0, data?.length);
+  } else {
+    //todo fix problem handling
+    return "error at fetching";
+  }
+
+  return data[idx];
 }
 
 export async function GET(request: NextRequest) {

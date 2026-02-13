@@ -1,13 +1,5 @@
-export function VideoSection() {
-
-  const videoId = "kArnEmqFBwA"
-
+export function VideoSection({ videoUrl }: { videoUrl: string }) {
   return (
-    <iframe
-      width="560"
-      height="315"
-      src={`https://www.youtube.com/embed/${videoId}`}
-      allowFullScreen
-    ></iframe>
+    <iframe width="560" height="315" src={videoUrl} allowFullScreen></iframe>
   );
 }

@@ -5,7 +5,7 @@ interface timeTopic {
   filter: string[];
 }
 
-export async function getVideo() {
+export async function getVideo(setter: any) {
   const rawData = localStorage.getItem("filters");
   let filterData: timeTopic;
   if (rawData) {
@@ -29,5 +29,12 @@ export async function getVideo() {
   const res = await fetch(`/api/video?${query}`);
   const data = await res.json();
 
-  return console.log(data);
+  if (typeof data === "string") {
+    return {
+      status: 500,
+      data: "none",
+    };
+  }
+
+  return setter(data.videoUrl);
 }
