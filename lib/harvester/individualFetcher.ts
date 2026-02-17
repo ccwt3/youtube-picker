@@ -1,5 +1,5 @@
 import "dotenv/config";
-const baseUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&key=${process.env.API_KEY}`;
+const baseUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&key=${process.env.API_KEY}`;
 
 interface manualVideos {
   id: string;
@@ -17,6 +17,9 @@ interface YouTubeVideoItem {
     categoryId: string;
     defaultLanguage?: string;
   };
+  contentDetails: {
+    duration: string
+  }
 }
 
 //? Manual tags (temporal)
@@ -37,6 +40,7 @@ export async function fetcher(ids: manualVideos[]) {
         category: item.snippet.categoryId,
         language: item.snippet.defaultLanguage,
         author: item.snippet.channelId,
+        duration: item.contentDetails.duration
       })) || [],
   );
 
