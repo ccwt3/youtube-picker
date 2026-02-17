@@ -35,6 +35,47 @@ async function randomVideo() {
   return data[idx];
 }
 
+async function filteredVideo(filters: string[], timesnaps: string[]) {
+  const supabase = await createClient();
+  console.log(filters, timesnaps);
+
+  let query = supabase.from("video").select(`
+      id,
+      videoUrl,
+      title,
+      category,
+      author,
+      duration,
+      video_tags!inner (
+        tags!inner (
+          id,
+          tag_name
+        )
+      )
+    `);
+
+  if (filters && filters.length > 0) {
+    query = query.in("video_tags.tags.tag_name", filters);
+  }
+
+  if (timesnaps && timesnaps.length > 0) {
+    query = query.in("duration", timesnaps);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Error fetching filtered videos:", error);
+    return [];
+  }
+
+  let idx = 0;
+  if (Array.isArray(data)) {
+    idx = randomIndex(0, data.length);
+  }
+
+  return data[idx];
+}
 export async function GET(request: NextRequest) {
   const parameters = request.nextUrl.searchParams;
 
@@ -46,5 +87,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(video);
   }
 
-  return NextResponse.json("osaka");
+  const video = await filteredVideo(filters, timeSnaps);
+
+  return NextResponse.json(video);
 }
