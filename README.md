@@ -1,8 +1,11 @@
-#### Introduction:
+# Silly picker
+---
+
+### Introduction:
 Silly picker is the thing that solves taking ages to choose a video while eating.
-#### Objectives:
+### Objectives:
 This project was aimed to make me go through a new web development ecosystem and propulse my abilities to learn "on the go" while maintaining the good practices I've learn all along.
-#### Structure:
+### Structure:
 This project was created using the NextJs Framework.
 
 It is structured by the frontend (app folder) with a minimalistic UI (ugly UI) which has a filter dialog which is a form with inputs type checkbox, when actioned the button "apply filters" it stores the filters in local Storage so whenever the user goes in it will keep the preferences.
@@ -11,16 +14,16 @@ When actioned the get Video button it gets the filters from local storage and bu
 
 the `app/api/` folder has only one route, the `/video` route receives query parameters and calls the database, using the parameters to filter the results and return the YouTube link type `/embed/` for returning it to the frontend and change the video without refreshing the page.
 
-**The Gold Star**: 
- (This process is completely separated from the user interactions).
- 
- The `harvester` folder contains a script which works based on 3 main functions.
- 
- The `generalFetcher` is ensured to build the queries that are going to be passed to the `YouTube Data v3` API, the queries are built thanks to the implementation of the Gemini API which based on a prompt, will generate a JSON type result with the `q=` parameter ready to inject into the parameters. At the end we will extract only the ID and title of the video and return those references.
-
- With the references returned we will call the `individualFetcher` who is going to iterate over the references and get the individual metadata of each video (language, duration, title, YouTube channel ID, etc.) sanitize and pass the Array of Objects ready to upload.
-
-At the end the `populateDB` will ensure to upload, normalize and deal with duplicated items in the database, returning 201 if all the operation succeeded.
+> ## **The Gold Star**: 
+> (This process is completely separated from the user interactions).
+> 
+> The `harvester` folder contains a script which works based on 3 main functions.
+> 
+> The `generalFetcher` is ensured to build the queries that are going to be passed to the `YouTube Data v3` API, the queries are built thanks to the implementation of the Gemini API which based on a prompt, will generate a JSON type result with the `q=` parameter ready to inject into the parameters. At the end we will extract only the ID and title of the video and return those references.
+>
+> With the references returned we will call the `individualFetcher` who is going to iterate over the references and get the individual metadata of each video (language, duration, title, YouTube channel ID, etc.) sanitize and pass the Array of Objects ready to upload.
+>
+> At the end the `populateDB` will ensure to upload, normalize and deal with duplicated items in the database, returning 201 if all the operation succeeded.
 #### Database:
 
 | video    | tags     | video_tags    |
@@ -63,13 +66,13 @@ CREATE TABLE public.video_tags (
 );
 ```
 
-#### Technologies:
+### Technologies:
 - NextJs.
 - Supabase.
 - YouTube Data API v3.
 - Gemini API.
 
-#### How to run:
+### How to run:
 For local development you should use the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=windows&queryGroups=access-method&access-method=studio). Along with two .env files:
 `.env`: this file used for the `harvester` script.
 - NEXT_PUBLIC_SUPABASE_URL
