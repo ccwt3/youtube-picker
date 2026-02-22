@@ -1,109 +1,90 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+#### Introduction:
+Silly picker is the thing that solves taking ages to choose a video while eating.
+#### Objectives:
+This project was aimed to make me go through a new web development ecosystem and propulse my abilities to learn "on the go" while maintaining the good practices I've learn all along.
+#### Structure:
+This project was created using the NextJs Framework.
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+It is structured by the frontend (app folder) with a minimalistic UI (ugly UI) which has a filter dialog which is a form with inputs type checkbox, when actioned the button "apply filters" it stores the filters in local Storage so whenever the user goes in it will keep the preferences.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+When actioned the get Video button it gets the filters from local storage and builds a query with the selected filter and passes them to the  `app/api/video` as a GET method.
 
-## Features
+the `app/api/` folder has only one route, the `/video` route receives query parameters and calls the database, using the parameters to filter the results and return the YouTube link type `/embed/` for returning it to the frontend and change the video without refreshing the page.
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+**The Gold Star**: 
+ (This process is completely separated from the user interactions).
+ 
+ The `harvester` folder contains a script which works based on 3 main functions.
+ 
+ The `generalFetcher` is ensured to build the queries that are going to be passed to the `YouTube Data v3` API, the queries are built thanks to the implementation of the Gemini API which based on a prompt, will generate a JSON type result with the `q=` parameter ready to inject into the parameters. At the end we will extract only the ID and title of the video and return those references.
 
-## Demo
+ With the references returned we will call the `individualFetcher` who is going to iterate over the references and get the individual metadata of each video (language, duration, title, YouTube channel ID, etc.) sanitize and pass the Array of Objects ready to upload.
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+At the end the `populateDB` will ensure to upload, normalize and deal with duplicated items in the database, returning 201 if all the operation succeeded.
+#### Database:
 
-## Deploy to Vercel
+| video    | tags     | video_tags    |
+| -------- | -------- | ------------- |
+| id (PK)  | id (PK)  | id (PK)       |
+| videoUrl | tag_name | video_id (FK) |
+| title    |          | tag_id (FK)   |
+| category |          |               |
+| language |          |               |
+| author   |          |               |
+| duration |          |               |
 
-Vercel deployment will guide you through creating a Supabase account and project.
+**SQL code:**
+``` SQL
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+CREATE TABLE public.tags (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  tag_name text NOT NULL UNIQUE,
+  CONSTRAINT tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.video (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  videoUrl text NOT NULL UNIQUE,
+  title text NOT NULL,
+  category text NOT NULL,
+  language text,
+  author text NOT NULL,
+  duration text,
+  CONSTRAINT video_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.video_tags (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  video_id bigint NOT NULL,
+  tag_id bigint NOT NULL,
+  CONSTRAINT video_tags_pkey PRIMARY KEY (id),
+  CONSTRAINT video_tags_video_id_fkey FOREIGN KEY (video_id) REFERENCES public.video(id),
+  CONSTRAINT video_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id)
+);
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+#### Technologies:
+- NextJs.
+- Supabase.
+- YouTube Data API v3.
+- Gemini API.
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+#### How to run:
+For local development you should use the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=windows&queryGroups=access-method&access-method=studio). Along with two .env files:
+`.env`: this file used for the `harvester` script.
+- NEXT_PUBLIC_SUPABASE_URL
+- SUPABASE_SERVICE_KEY
+- API_KEY (YouTube API key)
+- GEMINI (gemini API key)
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+`.env.local`: This file used for the NextJs runtime functions.
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-## Clone and run locally
+The page is separated in two, Next and Harvester, For the Next app the scripts are:
+- `pnpm sb_start` (starting the supabase CLI)
+- `pnpm dev` (Starting the localhost:3000 page)
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
-
-2. Create a Next.js app using the Supabase Starter template npx command
-
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
-
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
-
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
-
-3. Use `cd` to change into the app's directory
-
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
-
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+And for the harvester is:
+- `pnpm sb_start`
+- `pnpm harvester`
