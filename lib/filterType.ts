@@ -11,6 +11,7 @@ export const videoTopics = [
   { id: "podcast", content: "Podcasts" },
   { id: "documentary", content: "Documentary" },
   { id: "learning", content: "Learning" },
+  { id: "lifestyle", content: "Lifestyle"},
 ];
 
 export const manualIds = [
