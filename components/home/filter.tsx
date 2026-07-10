@@ -22,6 +22,15 @@ export default function FilterVar() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
   const handleUpdateFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -38,46 +47,79 @@ export default function FilterVar() {
 
   return (
     <>
-      <div className="flex justify-center items-center gap-3 bg-purple-500 w-card h-14 fixed top-14">
-        <Button size={"lg"} onClick={() => setOpen(true)}>
+      <header className="fixed top-0 z-30 flex h-14 w-full items-center justify-between border-b border-black bg-white px-4 sm:px-8">
+        <span className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-black">
+          Silly Picker
+        </span>
+        <Button
+          size="sm"
+          className="rounded-none border border-black bg-white text-black shadow-none transition-colors duration-150 hover:bg-black hover:text-white"
+          onClick={() => setOpen(true)}
+        >
           Filter
         </Button>
-      </div>
+      </header>
 
       {isOpen && (
-        <dialog open={isOpen} className="absolute z-20 w-filter top-28 p-4">
-          <form
-            className="grid grid-cols-2 gap-2 justify-items-start"
-            onSubmit={handleUpdateFilter}
+        <div
+          className="fixed inset-0 z-40 flex items-start justify-center bg-black/70 px-4 pt-24"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-filter border border-black bg-white"
+            onClick={(event) => event.stopPropagation()}
           >
-            <label className="col-span-2 justify-self-center">Duration: </label>
-            <EttiquetesList
-              ettiquetes={timeSnaps}
-              selectedFilters={timeFilters}
-              type="time"
-            />
+            <div className="flex items-center justify-between border-b border-black px-5 py-4">
+              <span className="font-mono text-xs uppercase tracking-widest text-black">
+                Filters
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close filters"
+                className="font-mono text-base leading-none text-black/50 transition-colors duration-150 hover:text-red-600"
+              >
+                x
+              </button>
+            </div>
 
-            <label className="col-span-2 justify-self-center">Topic: </label>
-            <EttiquetesList
-              ettiquetes={videoTopics}
-              selectedFilters={topicFilters}
-              type="topic"
-            />
+            <form onSubmit={handleUpdateFilter} className="p-6">
+              <fieldset className="mb-6">
+                <legend className="mb-3 font-mono text-[11px] uppercase tracking-widest text-black/50">
+                  Duration
+                </legend>
+                <div className="grid grid-cols-2 gap-3">
+                  <EttiquetesList
+                    ettiquetes={timeSnaps}
+                    selectedFilters={timeFilters}
+                    type="time"
+                  />
+                </div>
+              </fieldset>
 
-            <Button
-              type="submit"
-              size={"lg"}
-              className="col-span-2 justify-self-center"
-            >
-              Update
-            </Button>
-          </form>
-        </dialog>
+              <fieldset className="mb-7">
+                <legend className="mb-3 font-mono text-[11px] uppercase tracking-widest text-black/50">
+                  Topic
+                </legend>
+                <div className="grid grid-cols-2 gap-3">
+                  <EttiquetesList
+                    ettiquetes={videoTopics}
+                    selectedFilters={topicFilters}
+                    type="topic"
+                  />
+                </div>
+              </fieldset>
+
+              <Button
+                type="submit"
+                className="w-full rounded-none border border-black bg-red-600 py-5 text-white shadow-none transition-colors duration-150 hover:bg-black"
+              >
+                Apply filters
+              </Button>
+            </form>
+          </div>
+        </div>
       )}
-
-      <div
-        className={`w-dvw h-dvh absolute z-10 bg-[#00000070] ${isOpen ? "block" : "hidden"}`}
-      ></div>
     </>
   );
 }

@@ -12,26 +12,26 @@ export function EttiquetesList({
   selectedFilters?: string[];
   type: string;
 }) {
-  let val = "";
+  const val = type === "time" ? "timesnap[]" : "filter[]";
 
-  if (type === "time") val = "timesnap[]";
-  else if (type === "topic") val = "filter[]";
-
-  const timeList = ettiquetes.map((et) => {
-    return (
-      <div key={et.id}>
-        <input
-          type="checkbox"
-          id={et.id}
-          name={val}
-          value={et.id}
-          className="mr-2"
-          defaultChecked={selectedFilters?.includes(et.id) ?? false} //TODO
-        />
-        <label htmlFor={et.id}>{et.content}</label>
-      </div>
-    );
-  });
+  const timeList = ettiquetes.map((et) => (
+    <div key={et.id}>
+      <input
+        type="checkbox"
+        id={et.id}
+        name={val}
+        value={et.id}
+        className="peer sr-only"
+        defaultChecked={selectedFilters?.includes(et.id) ?? false}
+      />
+      <label
+        htmlFor={et.id}
+        className="block cursor-pointer select-none border border-black px-4 py-2.5 text-center font-mono text-xs uppercase tracking-wide text-black transition-colors duration-150 hover:border-red-600 peer-checked:border-red-600 peer-checked:bg-red-600 peer-checked:text-white"
+      >
+        {et.content}
+      </label>
+    </div>
+  ));
 
   return <>{timeList}</>;
 }

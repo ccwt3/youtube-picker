@@ -1,40 +1,51 @@
 "use client";
 
-interface timeTopic {
+export interface VideoData {
+  videoUrl: string;
+  title?: string;
+  author?: string;
+  duration?: string;
+  category?: string;
+}
+
+interface TimeTopicFilters {
   time: string[];
   filter: string[];
 }
 
-export async function getVideo(setter: any) {
+function readStoredFilters(): TimeTopicFilters {
   const rawData = localStorage.getItem("filters");
-  let filterData: timeTopic;
-  if (rawData) {
-    filterData = JSON.parse(rawData);
-  } else {
-    filterData = { time: [], filter: [] };
+  if (!rawData) return { time: [], filter: [] };
+
+  try {
+    const parsed = JSON.parse(rawData);
+    return {
+      time: Array.isArray(parsed.time) ? parsed.time : [],
+      filter: Array.isArray(parsed.filter) ? parsed.filter : [],
+    };
+  } catch {
+    return { time: [], filter: [] };
+  }
+}
+
+export async function fetchVideo(): Promise<VideoData> {
+  const filterData = readStoredFilters();
+
+  const params = new URLSearchParams();
+  filterData.time.forEach((t) => params.append("timesnap", t));
+  filterData.filter.forEach((f) => params.append("topic", f));
+
+  const res = await fetch(`/api/video?${params.toString()}`);
+
+  if (!res.ok) {
+    throw new Error("No se pudo obtener el video.");
   }
 
-  let query = "";
-
-  filterData.time.forEach((t) => {
-    query += `&timesnap=${t}`;
-  });
-
-  filterData.filter.forEach((f) => {
-    query += `&topic=${f}`;
-  });
-
-  console.log(query);
-
-  const res = await fetch(`/api/video?${query}`);
   const data = await res.json();
 
-  if (typeof data === "string") {
-    return {
-      status: 500,
-      data: "none",
-    };
+  if (typeof data === "string" || !data || !data.videoUrl) {
+    throw new Error("La base de datos esta desactivada");
   }
 
-  return setter(data.videoUrl);
+  return data as VideoData;
 }

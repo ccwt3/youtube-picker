@@ -13,6 +13,10 @@ async function randomVideo() {
   const { data, error } = await supabase.from("video").select(`
     id,
     videoUrl,
+    title,
+    category,
+    author,
+    duration,
     video_tags (
       tags (
         id,
